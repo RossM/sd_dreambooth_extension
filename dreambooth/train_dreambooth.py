@@ -834,16 +834,15 @@ def main(class_gen_method: str = "Native Diffusers", user: str = None) -> TrainR
 
             # create ema, fix OOM
             if args.use_ema:
+                ema_model.model.to(accelerator.device)
                 if stop_text_percentage != 0:
                     (
-                        ema_model.model,
                         unet,
                         text_encoder,
                         optimizer,
                         train_dataloader,
                         lr_scheduler,
                     ) = accelerator.prepare(
-                        ema_model.model,
                         unet,
                         text_encoder,
                         optimizer,
@@ -852,13 +851,12 @@ def main(class_gen_method: str = "Native Diffusers", user: str = None) -> TrainR
                     )
                 else:
                     (
-                        ema_model.model,
                         unet,
                         optimizer,
                         train_dataloader,
                         lr_scheduler,
                     ) = accelerator.prepare(
-                        ema_model.model, unet, optimizer, train_dataloader, lr_scheduler
+                        unet, optimizer, train_dataloader, lr_scheduler
                     )
             else:
                 if stop_text_percentage != 0:
