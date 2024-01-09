@@ -1631,14 +1631,12 @@ def main(class_gen_method: str = "Native Diffusers", user: str = None) -> TrainR
                                 else:
                                     model_pred = unet(noisy_latents, timesteps, encoder_hidden_states).sample
 
+                                delta_pred = (target - model_pred).detach()
+                                delta_pred.mul_(dream_lambda)
                                 if noise_scheduler.config.prediction_type == "epsilon":
-                                    delta_pred = (noise - model_pred).detach()
-                                    delta_pred.mul_(dream_lambda)
                                     latents.add_(sqrt_one_minus_alpha_prod * delta_pred)
                                     target.add_(delta_pred)
                                 elif noise_scheduler.config.prediction_type == "v_prediction":
-                                    delta_pred = (target - model_pred).detach()
-                                    delta_pred.mul_(dream_lambda)
                                     latents.add_(sqrt_one_minus_alpha_prod * delta_pred)
                                     target.add_(sqrt_alpha_prod * delta_pred)
                                 else:
