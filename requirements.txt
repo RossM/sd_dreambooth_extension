@@ -6,5 +6,6 @@ fastapi
 gitpython>=3.1.40
 pytorch_optimizer==2.12.0
 Pillow
+safetensors>=0.4.1
 tqdm
 tomesd>=0.1.2
