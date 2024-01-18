@@ -482,7 +482,6 @@ def get_scheduler(
             num_warmup_steps=num_warmup_steps,
             num_training_steps=total_training_steps,
             min_lr=min_lr_scale,
-            num_cycles=num_cycles,
         )
 
     if name == SchedulerType.REX:
