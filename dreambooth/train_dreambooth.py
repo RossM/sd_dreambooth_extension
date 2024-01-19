@@ -863,11 +863,8 @@ def main(class_gen_method: str = "Native Diffusers", user: str = None) -> TrainR
                 num_workers=n_workers,
             )
 
-            max_train_steps = args.num_train_epochs * len(train_dataset)
-
-            # This is separate, because optimizer.step is only called once per "step" in training, so it's not
-            # affected by batch size
-            sched_train_steps = args.num_train_epochs * train_dataset.num_train_images
+            # The actual number of training steps depends on batch size
+            max_train_steps = args.num_train_epochs * math.ceil(len(train_dataset) / train_batch_size) * train_batch_size
 
             lr_scale_pos = args.lr_scale_pos
             if class_prompts:
@@ -877,7 +874,7 @@ def main(class_gen_method: str = "Native Diffusers", user: str = None) -> TrainR
                 name=args.lr_scheduler,
                 optimizer=optimizer,
                 num_warmup_steps=args.lr_warmup_steps,
-                total_training_steps=sched_train_steps,
+                total_training_steps=max_train_steps,
                 min_lr=args.learning_rate_min,
                 total_epochs=args.num_train_epochs,
                 num_cycles=args.lr_cycles,
@@ -988,7 +985,6 @@ def main(class_gen_method: str = "Native Diffusers", user: str = None) -> TrainR
             logger.debug(f"  Gradient Accumulation steps = {gradient_accumulation_steps}")
             logger.debug(f"  Total train batch size (w. parallel, distributed & accumulation) = {total_batch_size}")
             logger.debug(f"  Text Encoder Epochs: {text_encoder_epochs}")
-            logger.debug(f"  Total optimization steps = {sched_train_steps}")
             logger.debug(f"  Total training steps = {max_train_steps}")
             logger.debug(f"  Resuming from checkpoint: {resume_from_checkpoint}")
             logger.debug(f"  First resume epoch: {first_epoch}")
