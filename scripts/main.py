@@ -919,6 +919,13 @@ def on_ui_tabs():
                             db_save_state_cancel = gr.Checkbox(
                                 label="Save separate diffusers snapshots when training is canceled."
                             )
+                            db_checkpoints_total_limit = gr.Slider(
+                                label="Maximum diffusers snapshots to keep on disk (0 for unlimited)",
+                                minimum=0,
+                                maximum=100,
+                                step=1,
+                                value=0,
+                            )
                     with gr.Accordion(open=False, label="Image Generation", elem_id="TabGenerate") as db_generate_tab:
                         gr.HTML(value="Class Generation Schedulers")
                         db_class_gen_method = gr.Dropdown(
@@ -1533,6 +1540,7 @@ def on_ui_tabs():
             db_save_state_after,
             db_save_state_cancel,
             db_save_state_during,
+            db_checkpoints_total_limit,
             db_scheduler,
             db_shared_diffusers_path,
             db_shuffle_tags,

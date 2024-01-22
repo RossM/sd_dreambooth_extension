@@ -966,8 +966,8 @@ def main(class_gen_method: str = "Native Diffusers", user: str = None) -> TrainR
                     modules.shared.cmd_opts.disable_safe_unpickle = no_safe
                     global_step = resume_step = args.revision
                     resume_from_checkpoint = True
-                    first_epoch = args.lifetime_epoch
-                    global_epoch = args.lifetime_epoch
+                    first_epoch = args.epoch
+                    global_epoch = args.epoch
                 except Exception as lex:
                     logger.warning(f"Exception loading checkpoint: {lex}")
 
@@ -1281,6 +1281,30 @@ def main(class_gen_method: str = "Native Diffusers", user: str = None) -> TrainR
                                         f"Saving snapshot at step {args.revision}..."
                                     )
                                     update_status({"status": status.textinfo})
+
+                                    # _before_ saving state, check if this save would set us over the `checkpoints_total_limit`
+                                    if args.checkpoints_total_limit > 0:
+                                        try:
+                                            checkpoints = os.listdir(os.path.join(args.model_dir, "checkpoints"))
+                                            checkpoints = [d for d in checkpoints if d.startswith("checkpoint")]
+                                            checkpoints = sorted(checkpoints, key=lambda x: int(x.split("-")[1]))
+
+                                            # before we save the new checkpoint, we need to have at _most_ `checkpoints_total_limit - 1` checkpoints
+                                            if len(checkpoints) >= args.checkpoints_total_limit:
+                                                num_to_remove = len(checkpoints) - args.checkpoints_total_limit + 1
+                                                removing_checkpoints = checkpoints[0:num_to_remove]
+
+                                                logger.info(
+                                                    f"{len(checkpoints)} checkpoints already exist, removing {len(removing_checkpoints)} checkpoints"
+                                                )
+                                                logger.info(f"removing checkpoints: {', '.join(removing_checkpoints)}")
+
+                                                for removing_checkpoint in removing_checkpoints:
+                                                    removing_checkpoint = os.path.join(args.output_dir, removing_checkpoint)
+                                                    shutil.rmtree(removing_checkpoint)
+                                        except:
+                                            pass
+                                    
                                     accelerator.save_state(
                                         os.path.join(
                                             args.model_dir,
@@ -1589,19 +1613,19 @@ def main(class_gen_method: str = "Native Diffusers", user: str = None) -> TrainR
 
                 for step, batch in enumerate(train_dataloader):
                     # Skip steps until we reach the resumed step
-                    if (
-                            resume_from_checkpoint
-                            and epoch == first_epoch
-                            and step < resume_step
-                    ):
-                        progress_bar.update(train_batch_size)
-                        progress_bar.reset()
-                        status.job_count = max_train_steps
-                        status.job_no += train_batch_size
-                        stats["session_step"] += train_batch_size
-                        stats["lifetime_step"] += train_batch_size
-                        update_status(stats)
-                        continue
+                    if resume_from_checkpoint and epoch == first_epoch:
+                        if step < resume_step:
+                            progress_bar.set_description(f"Skipping to step {resume_step}")
+                            progress_bar.update(train_batch_size)
+                            # progress_bar.reset()
+                            status.job_count = max_train_steps
+                            status.job_no += train_batch_size
+                            stats["session_step"] += train_batch_size
+                            stats["lifetime_step"] += train_batch_size
+                            update_status(stats)
+                            continue
+                        elif step == resume_step:
+                            progress_bar.set_description(f"Steps")
 
                     with ConditionalAccumulator(accelerator, unet, text_encoder, text_encoder_two):
                         # Convert images to latent space

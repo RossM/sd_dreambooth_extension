@@ -109,6 +109,7 @@ class DreamboothConfig(BaseModel):
     save_state_after: bool = False
     save_state_cancel: bool = False
     save_state_during: bool = False
+    checkpoints_total_limit: int = 0
     scheduler: str = "ddim"
     shared_diffusers_path: str = ""
     shuffle_tags: bool = True
