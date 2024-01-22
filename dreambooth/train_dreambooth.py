@@ -1626,6 +1626,7 @@ def main(class_gen_method: str = "Native Diffusers", user: str = None) -> TrainR
                             continue
                         elif step == resume_step:
                             progress_bar.set_description(f"Steps")
+                            progress_bar.reset()
 
                     with ConditionalAccumulator(accelerator, unet, text_encoder, text_encoder_two):
                         # Convert images to latent space
