@@ -1519,7 +1519,7 @@ def main(class_gen_method: str = "Native Diffusers", user: str = None) -> TrainR
 
             # Only show the progress bar once on each machine, and do not send statuses to the new UI.
             progress_bar = mytqdm(
-                range(global_step, max_train_steps),
+                total=max_train_steps,
                 disable=not accelerator.is_local_main_process,
                 position=0
             )
@@ -1611,22 +1611,11 @@ def main(class_gen_method: str = "Native Diffusers", user: str = None) -> TrainR
                 instance_loss = None
                 prior_loss = None
 
-                for step, batch in enumerate(train_dataloader):
-                    # Skip steps until we reach the resumed step
-                    if resume_from_checkpoint and epoch == first_epoch:
-                        if step < resume_step:
-                            progress_bar.set_description(f"Skipping to step {resume_step}")
-                            progress_bar.update(train_batch_size)
-                            # progress_bar.reset()
-                            status.job_count = max_train_steps
-                            status.job_no += train_batch_size
-                            stats["session_step"] += train_batch_size
-                            stats["lifetime_step"] += train_batch_size
-                            update_status(stats)
-                            continue
-                        elif step == resume_step:
-                            progress_bar.set_description(f"Steps")
+                if resume_from_checkpoint and epoch == first_epoch:
+                    lr_scheduler.step(resume_step)
+                    progress_bar.update(resume_step)
 
+                for batch in train_dataloader:
                     with ConditionalAccumulator(accelerator, unet, text_encoder, text_encoder_two):
                         # Convert images to latent space
                         with torch.no_grad():
