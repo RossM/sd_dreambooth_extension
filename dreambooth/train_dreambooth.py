@@ -1300,7 +1300,7 @@ def main(class_gen_method: str = "Native Diffusers", user: str = None) -> TrainR
                                                 logger.info(f"removing checkpoints: {', '.join(removing_checkpoints)}")
 
                                                 for removing_checkpoint in removing_checkpoints:
-                                                    removing_checkpoint = os.path.join(args.output_dir, removing_checkpoint)
+                                                    removing_checkpoint = os.path.join(args.model_dir, "checkpoints", removing_checkpoint)
                                                     shutil.rmtree(removing_checkpoint)
                                         except:
                                             pass
