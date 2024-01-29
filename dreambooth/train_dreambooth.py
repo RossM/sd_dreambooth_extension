@@ -1134,6 +1134,8 @@ def main(class_gen_method: str = "Native Diffusers", user: str = None) -> TrainR
                             vae=vae.to(accelerator.device),
                             torch_dtype=weight_dtype,
                             revision=args.revision,
+                            safety_checker=None,
+                            requires_safety_checker=False,
                         )
                         xformerify(s_pipeline.unet, use_lora=args.use_lora)
                     else:
@@ -1146,6 +1148,8 @@ def main(class_gen_method: str = "Native Diffusers", user: str = None) -> TrainR
                             vae=vae,
                             torch_dtype=weight_dtype,
                             revision=args.revision,
+                            safety_checker=None,
+                            requires_safety_checker=False,
                         )
                         xformerify(s_pipeline.unet, use_lora=args.use_lora)
                         xformerify(s_pipeline.vae, use_lora=args.use_lora)
