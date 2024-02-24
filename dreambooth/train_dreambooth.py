@@ -1762,8 +1762,12 @@ def main(class_gen_method: str = "Native Diffusers", user: str = None) -> TrainR
                             # Predict the noise residual and compute loss
                             model_pred = unet(noisy_latents, timesteps, encoder_hidden_states).sample
 
-                        loss_fn = lambda model_pred, target: (F.mse_loss(model_pred.float(), target.float(), "none") * loss_weight[timesteps]).mean()
-
+                        def loss_fn(model_pred, target):
+                            nonlocal loss_weight, timesteps
+                            loss = F.mse_loss(model_pred.float(), target.float(), reduction="none").mean(dim=(1,2,3))
+                            loss = loss * loss_weight[timesteps]
+                            return loss.mean()
+                        
                         if args.model_type != "SDXL":
                             # TODO: set a prior preservation flag and use that to ensure this ony happens in dreambooth
                             if not args.split_loss and not with_prior_preservation:
