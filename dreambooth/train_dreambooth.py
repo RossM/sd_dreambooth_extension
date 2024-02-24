@@ -1566,6 +1566,17 @@ def main(class_gen_method: str = "Native Diffusers", user: str = None) -> TrainR
             last_tenc = 0 < text_encoder_epochs
             if stop_text_percentage == 0:
                 last_tenc = False
+               
+            if args.min_snr_gamma > 0:
+                # Compute signal-to-noise ratio
+                alphas_cumprod = noise_scheduler.alphas_cumprod.to(unet.device)
+                snr = alphas_cumprod / (1 - alphas_cumprod)
+                # Compute MinSNR loss weight
+                loss_weight = torch.clamp(snr, max=args.min_snr_gamma)
+                # Rescale loss weight to keep existing hyperparams sane
+                loss_weight.div_(loss_weight.mean())
+            else:
+                loss_weight = torch.ones_like(noise_scheduler.alphas_cumprod, device=unet.device)
 
             cleanup()
             stats = {
@@ -1751,11 +1762,12 @@ def main(class_gen_method: str = "Native Diffusers", user: str = None) -> TrainR
                             # Predict the noise residual and compute loss
                             model_pred = unet(noisy_latents, timesteps, encoder_hidden_states).sample
 
+                        loss_fn = lambda model_pred, target: (F.mse_loss(model_pred.float(), target.float(), "none") * loss_weight[timesteps]).mean()
+
                         if args.model_type != "SDXL":
                             # TODO: set a prior preservation flag and use that to ensure this ony happens in dreambooth
                             if not args.split_loss and not with_prior_preservation:
-                                loss = instance_loss = torch.nn.functional.mse_loss(model_pred.float(), target.float(),
-                                                                                    reduction="mean")
+                                loss = instance_loss = loss_fn(model_pred, target)
                                 loss *= batch["loss_avg"]
                             else:
                                 # Predict the noise residual
@@ -1770,16 +1782,13 @@ def main(class_gen_method: str = "Native Diffusers", user: str = None) -> TrainR
                                     target, target_prior = torch.chunk(target, 2, dim=0)
 
                                     # Compute instance loss
-                                    loss = instance_loss = F.mse_loss(model_pred.float(), target.float(),
-                                                                      reduction="mean")
+                                    loss = instance_loss = loss_fn(model_pred, target)
 
                                     # Compute prior loss
-                                    prior_loss = F.mse_loss(model_pred_prior.float(), target_prior.float(),
-                                                            reduction="mean")
+                                    prior_loss = loss_fn(model_pred_prior, target_prior)
                                 else:
                                     # Compute loss
-                                    loss = instance_loss = F.mse_loss(model_pred.float(), target.float(),
-                                                                      reduction="mean")
+                                    loss = instance_loss = loss_fn(model_pred, target)
                         else:
                             if with_prior_preservation:
                                 # Chunk the noise and model_pred into two parts and compute the loss on each part separately.
@@ -1791,16 +1800,15 @@ def main(class_gen_method: str = "Native Diffusers", user: str = None) -> TrainR
                                     target, target_prior = torch.chunk(target, 2, dim=0)
 
                                 # Compute instance loss
-                                loss = F.mse_loss(model_pred.float(), target.float(), reduction="mean")
+                                loss = loss_fn(model_pred, target)
 
                                 # Compute prior loss
-                                prior_loss = F.mse_loss(model_pred_prior.float(), target_prior.float(),
-                                                        reduction="mean")
+                                prior_loss = loss_fn(model_pred_prior, target_prior)
 
                                 # Add the prior loss to the instance loss.
                                 loss = loss + args.prior_loss_weight * prior_loss
                             else:
-                                loss = F.mse_loss(model_pred.float(), target.float(), reduction="mean")
+                                loss = loss_fn(model_pred, target)
 
                         accelerator.backward(loss)
 
