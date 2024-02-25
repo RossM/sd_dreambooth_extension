@@ -518,6 +518,7 @@ def main(class_gen_method: str = "Native Diffusers", user: str = None) -> TrainR
 
                 if (
                         args.stop_text_encoder != 0
+                        and text_encoder_two != None
                         and accelerator.unwrap_model(text_encoder_two).dtype != torch.float32
                 ):
                     logger.warning(
