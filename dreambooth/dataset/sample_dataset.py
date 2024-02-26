@@ -56,7 +56,8 @@ class SampleDataset:
                         pass
             else:
                 prompts = [(sample_prompt, (config.resolution, config.resolution))]
-            random.shuffle(prompts)
+            if required < len(prompts):
+                random.shuffle(prompts)
             for i in range(required):
                 pi = prompts[i % len(prompts)]
                 pd = PromptData(
