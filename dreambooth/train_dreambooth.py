@@ -27,7 +27,8 @@ from diffusers import (
     DiffusionPipeline,
     UNet2DConditionModel,
     DEISMultistepScheduler,
-    UniPCMultistepScheduler, StableDiffusionXLPipeline, StableDiffusionPipeline
+    UniPCMultistepScheduler, StableDiffusionXLPipeline, StableDiffusionPipeline,
+    EulerAncestralDiscreteScheduler
 )
 from diffusers.loaders import LoraLoaderMixin
 from diffusers.models.attention_processor import LoRAAttnProcessor2_0, LoRAAttnProcessor
@@ -1394,6 +1395,8 @@ def main(class_gen_method: str = "Native Diffusers", user: str = None) -> TrainR
                             s_pipeline.enable_xformers_memory_efficient_attention()
                         except:
                             pass
+
+                        s_pipeline.scheduler = EulerAncestralDiscreteScheduler.from_config(s_pipeline.scheduler.config)
 
                         samples = []
                         sample_prompts = []
