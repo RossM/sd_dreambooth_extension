@@ -1385,9 +1385,10 @@ def main(class_gen_method: str = "Native Diffusers", user: str = None) -> TrainR
                             )
                             if args.tomesd:
                                 tomesd.apply_patch(s_pipeline, ratio=args.tomesd, use_rand=False)
+                        if ema_model != None:
+                            ema_model.apply(s_pipeline.unet)
                         if args.use_lora:
                             s_pipeline.load_lora_weights(lora_save_file)
-
                         try:
                             s_pipeline.enable_vae_tiling()
                             s_pipeline.enable_vae_slicing()
