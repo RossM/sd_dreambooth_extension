@@ -139,7 +139,7 @@ def extract_checkpoint(
         if model_type == "SDXL":
             image_size = 1024
     unload_system_models()
-    to_safetensors = False
+    to_safetensors = True
     if pipeline_class_name is not None:
         library = importlib.import_module("diffusers")
         class_obj = getattr(library, pipeline_class_name)
@@ -179,7 +179,7 @@ def extract_checkpoint(
                 pipe.controlnet.save_pretrained(dump_path, safe_serialization=to_safetensors)
             else:
                 try:
-                    pipe.save_pretrained(dump_path, safe_serialization=False)
+                    pipe.save_pretrained(dump_path, safe_serialization=True)
                 except:
                     print("Couldn't save the pipe")
                     traceback.print_exc()
