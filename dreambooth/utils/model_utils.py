@@ -299,10 +299,11 @@ def safe_unpickle_disabled():
 def xformerify(obj, use_lora):
     try:
         import xformers
-        obj.enable_xformers_memory_efficient_attention
+        obj.enable_xformers_memory_efficient_attention()
         logger.debug("Enabled XFormers for " + obj.__class__.__name__)
 
-    except ImportError:
+    except ImportError as e:
+        logger.warning(f"Failed to enable xformers. Did you pass the --xformers command line flag when starting the webui?")
         obj.set_attn_processor(AttnProcessor2_0())
         logger.debug("Enabled AttnProcessor2_0 for " + obj.__class__.__name__)
 
