@@ -40,10 +40,8 @@ def convert_diffusers_to_kohya_lora(path, metadata, alpha=0.8):
     alpha_keys = []
     # Replace the things
     for (key, v) in model_dict.items():
-        old_key = key
         for (kc,vc) in to_replace.items():
             key = key.replace(kc, vc)            
-        print(f"convert_diffusers_to_kohya_lora: {old_key} -> {key}")
         akey = key
 
         # Check for missing alpha keys
