@@ -654,8 +654,9 @@ def main(class_gen_method: str = "Native Diffusers", user: str = None) -> TrainR
 
                 # Load LoRA weights if specified
                 if args.lora_model_name is not None and args.lora_model_name != "":
+                    loras_dir = os.path.join(shared.models_path, "Lora")
                     logger.debug(f"Load lora from {args.lora_model_name}")
-                    lora_state_dict, network_alphas = LoraLoaderMixin.lora_state_dict(args.lora_model_name)
+                    lora_state_dict, network_alphas = LoraLoaderMixin.lora_state_dict(os.path.join(loras_dir, args.lora_model_name))
                     LoraLoaderMixin.load_lora_into_unet(lora_state_dict, network_alphas=network_alphas, unet=unet)
 
                     LoraLoaderMixin.load_lora_into_text_encoder(
