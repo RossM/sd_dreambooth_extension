@@ -658,6 +658,14 @@ def on_ui_tabs():
                             value=0.5,
                             visible=True,
                         )
+                        db_dream_randomness = gr.Slider(
+                            label="DREAM randomness",
+                            minimum=0,
+                            maximum=1,
+                            step=0.01,
+                            value=0.0,
+                            visible=True,
+                        )
                         db_freeze_spectral_norm = gr.Checkbox(
                             label="Freeze Spectral Norm", value=False
                         )
@@ -1377,6 +1385,7 @@ def on_ui_tabs():
             db_min_snr_gamma,
             db_use_dream,
             db_dream_detail_preservation,
+            db_dream_randomness,
             db_freeze_spectral_norm,
             db_pad_tokens,
             db_strict_tokens,
@@ -1514,6 +1523,7 @@ def on_ui_tabs():
             db_min_snr_gamma,
             db_use_dream,
             db_dream_detail_preservation,
+            db_dream_randomness,
             db_freeze_spectral_norm,
             db_mixed_precision,
             db_model_name,

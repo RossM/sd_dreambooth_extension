@@ -198,6 +198,11 @@
     "title": "Select how much detail DREAM preserves.",
     "description": "A factor that influences how DREAM trades off composition versus detail. Low values will improve composition but may result in loss of detail. High values preserve detail but may reduce the overall effect of DREAM."
   },
+  "dream_randomness": {
+    "label": "DREAM randomness",
+    "title": "Adds a small amount of randomness to DREAM.",
+    "description": "Experimental."
+  },
   "freeze_spectral_norm": {
     "label": "Freeze Spectral Norm",
     "title": "Freeze spectral norm of the model weights.",

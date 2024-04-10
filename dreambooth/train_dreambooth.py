@@ -1742,6 +1742,7 @@ def main(class_gen_method: str = "Native Diffusers", user: str = None) -> TrainR
 
                                 # The paper uses lambda = sqrt(1 - alpha) ** p, with p = 1 in their experiments.
                                 dream_lambda = (1 - alpha_prod) ** args.dream_detail_preservation
+                                dream_lambda = dream_lambda * (1 + args.dream_randomness * torch.randn_like(dream_lambda))
 
                                 if args.model_type == "SDXL":
                                     with accelerator.autocast():

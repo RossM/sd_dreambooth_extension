@@ -239,13 +239,15 @@
 
 
                                                 <span class="input-group-btn linkBtn db-advanced">
-                                                  <button class="btn btn-link btn-sm" type="button">
-                                                      <i class="bx bx-link"></i>
-                                                  </button>
-                                            </span>
-                                                <label class="form-label mt-3 db-advanced" for="txt_learning_rate">Learning
+                                                    <button class="btn btn-link btn-sm" type="button">
+                                                        <i class="bx bx-link"></i>
+                                                    </button>
+                                                </span>
+                                                <label class="form-label mt-3 db-advanced" for="txt_learning_rate">
+                                                    Learning
                                                     Rate
-                                                    (Tenc)</label>
+                                                    (Tenc)
+                                                </label>
                                                 <div class="input-group">
                                                     <input class="dbInput form-control db-advanced" type="number"
                                                            id="txt_learning_rate" name="txt_learning_rate"
@@ -254,8 +256,10 @@
                                             </div>
 
                                             <div class="form-group">
-                                                <label class="form-label" for="min_learning_rate">Minimum Learning
-                                                    Rate</label>
+                                                <label class="form-label" for="min_learning_rate">
+                                                    Minimum Learning
+                                                    Rate
+                                                </label>
                                                 <input class="dbInput form-control" type="number" id="min_learning_rate"
                                                        name="min_learning_rate" value="0.000001">
                                             </div>
@@ -291,7 +295,7 @@
                                                      data-step="0.25" id="tenc_grad_clip_norm" data-value="0"
                                                      data-label="TENC Gradient Clip Norm"></div>
                                             </div>
-                                             <div class="form-group">
+                                            <div class="form-group">
                                                 <div class="dbInput db-slider" data-min="0" data-max="10.0"
                                                      data-step="0.1" id="min_snr_gamma" data-value="0.0"
                                                      data-label="Min SNR Gamma"></div>
@@ -303,10 +307,15 @@
                                                     <label class="form-check-label" for="use_dream">Use DREAM</label>
                                                 </div>
                                             </div>
-                                             <div class="form-group">
+                                            <div class="form-group">
                                                 <div class="dbInput db-slider" data-min="0" data-max="1.0"
                                                      data-step="0.01" id="dream_detail_preservation" data-value="0.5"
                                                      data-label="DREAM detail preservation"></div>
+                                            </div>
+                                            <div class="form-group">
+                                                <div class="dbInput db-slider" data-min="0" data-max="1.0"
+                                                     data-step="0.01" id="dream_randomness" data-value="0.5"
+                                                     data-label="DREAM randomness"></div>
                                             </div>
                                             <div class="form-group">
                                                 <div class="form-check form-switch">
@@ -330,8 +339,10 @@
                                                 <div class="form-check form-switch">
                                                     <input class="dbInput form-check-input" type="checkbox"
                                                            id="shuffle_tags" name="shuffle_tags" checked>
-                                                    <label class="form-check-label" for="shuffle_tags">Shuffle
-                                                        Tags</label>
+                                                    <label class="form-check-label" for="shuffle_tags">
+                                                        Shuffle
+                                                        Tags
+                                                    </label>
                                                 </div>
                                             </div>
                                             <div class="form-group">
@@ -339,8 +350,10 @@
                                                     <input class="dbInput form-check-input" type="checkbox"
                                                            id="strict_tokens"
                                                            name="strict_tokens" checked>
-                                                    <label class="form-check-label" for="strict_tokens">Strict
-                                                        Tokens</label>
+                                                    <label class="form-check-label" for="strict_tokens">
+                                                        Strict
+                                                        Tokens
+                                                    </label>
                                                 </div>
                                             </div>
                                             <div class="form-group">
@@ -348,8 +361,10 @@
                                                     <input class="dbInput form-check-input" type="checkbox"
                                                            id="gradient_checkpointing"
                                                            name="gradient_checkpointing">
-                                                    <label class="form-check-label" for="gradient_checkpointing">Gradient
-                                                        Checkpointing</label>
+                                                    <label class="form-check-label" for="gradient_checkpointing">
+                                                        Gradient
+                                                        Checkpointing
+                                                    </label>
                                                 </div>
                                             </div>
                                             <div class="form-group">
@@ -357,8 +372,10 @@
                                                     <input class="dbInput form-check-input" type="checkbox"
                                                            id="gradient_set_to_none"
                                                            name="gradient_set_to_none" checked>
-                                                    <label class="form-check-label" for="gradient_set_to_none">Set
-                                                        Gradients to None</label>
+                                                    <label class="form-check-label" for="gradient_set_to_none">
+                                                        Set
+                                                        Gradients to None
+                                                    </label>
                                                 </div>
                                             </div>
                                             <div class="form-group">
@@ -366,8 +383,10 @@
                                                     <input class="dbInput form-check-input" type="checkbox"
                                                            id="freeze_clip_normalization"
                                                            name="gradient_checkpointing">
-                                                    <label class="form-check-label" for="freeze_clip_normalization">Freeze
-                                                        CLIP Normalization</label>
+                                                    <label class="form-check-label" for="freeze_clip_normalization">
+                                                        Freeze
+                                                        CLIP Normalization
+                                                    </label>
                                                 </div>
                                             </div>
                                             <div class="form-group">
@@ -391,8 +410,10 @@
                                                     <input class="dbInput form-check-input" type="checkbox"
                                                            id="disable_logging" name="disable_logging"
                                                            data-key="disable_logging" checked>
-                                                    <label class="form-check-label" for="disable_logging">Disable
-                                                        Logging</label>
+                                                    <label class="form-check-label" for="disable_logging">
+                                                        Disable
+                                                        Logging
+                                                    </label>
                                                 </div>
                                             </div>
                                         </form>

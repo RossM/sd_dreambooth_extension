@@ -125,7 +125,7 @@
     "max": 1,
     "step": 0.001
   },
-  "input_pertubation":{
+  "input_pertubation": {
     "value": false
   },
   "offset_noise": {
@@ -157,6 +157,12 @@
   },
   "dream_detail_preservation": {
     "value": 0.5,
+    "min": 0.0,
+    "max": 1,
+    "step": 0.01
+  },
+  "dream_randomness": {
+    "value": 0.0,
     "min": 0.0,
     "max": 1,
     "step": 0.01
