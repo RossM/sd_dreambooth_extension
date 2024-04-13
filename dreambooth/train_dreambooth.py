@@ -1739,21 +1739,35 @@ def main(class_gen_method: str = "Native Diffusers", user: str = None) -> TrainR
                                     timesteps, None, None, None]
                                 sqrt_alpha_prod = alpha_prod ** 0.5
                                 sqrt_one_minus_alpha_prod = (1 - alpha_prod) ** 0.5
+ 
+                                if args.dream_randomness > 0.0:
+                                    dream_noise = (1 - args.dream_randomness) ** 0.5 * noise + args.dream_randomness ** 0.5 * torch.randn_like(noise)
+                                    dream_input = noise_scheduler.add_noise(latents, dream_noise, timesteps)
+                                    if noise_scheduler.config.prediction_type == "epsilon":
+                                        dream_target = dream_noise
+                                    elif noise_scheduler.config.prediction_type == "v_prediction":
+                                        dream_target = noise_scheduler.get_velocity(latents, dream_noise, timesteps)
+                                    else:
+                                        raise ValueError(f"Unknown prediction type {noise_scheduler.config.prediction_type}")
+                                    del dream_noise
+                                else:
+                                    dream_input = noisy_latents
+                                    dream_target = target
 
                                 # The paper uses lambda = sqrt(1 - alpha) ** p, with p = 1 in their experiments.
                                 dream_lambda = (1 - alpha_prod) ** args.dream_detail_preservation
-                                dream_lambda = dream_lambda * (1 + args.dream_randomness * torch.randn_like(dream_lambda))
+                                dream_lambda = dream_lambda * (1 + args.dream_randomness2 * torch.randn_like(dream_lambda))
 
                                 if args.model_type == "SDXL":
                                     with accelerator.autocast():
                                         model_pred = unet(
-                                            noisy_latents, timesteps, batch["input_ids"],
+                                            dream_input, timesteps, batch["input_ids"],
                                             added_cond_kwargs=batch["unet_added_conditions"]
                                         ).sample
                                 else:
-                                    model_pred = unet(noisy_latents, timesteps, encoder_hidden_states).sample
+                                    model_pred = unet(dream_input, timesteps, encoder_hidden_states).sample
 
-                                delta_pred = (target - model_pred).detach()
+                                delta_pred = (dream_target - model_pred).detach()
                                 delta_pred.mul_(dream_lambda)
                                 if noise_scheduler.config.prediction_type == "epsilon":
                                     latents.add_(sqrt_one_minus_alpha_prod * delta_pred)
@@ -1765,7 +1779,7 @@ def main(class_gen_method: str = "Native Diffusers", user: str = None) -> TrainR
                                     raise ValueError(
                                         f"Unknown prediction type {noise_scheduler.config.prediction_type}")
 
-                                del alpha_prod, sqrt_alpha_prod, sqrt_one_minus_alpha_prod, dream_lambda, model_pred, delta_pred
+                                del alpha_prod, sqrt_alpha_prod, sqrt_one_minus_alpha_prod, dream_lambda, model_pred, delta_pred, dream_input, dream_target
 
                         if args.model_type == "SDXL":
                             with accelerator.autocast():

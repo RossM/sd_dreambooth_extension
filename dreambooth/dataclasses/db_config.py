@@ -74,6 +74,7 @@ class DreamboothConfig(BaseModel):
     use_dream: bool = False
     dream_detail_preservation: float = 0.5
     dream_randomness: float = 0.0
+    dream_randomness2: float = 0.0
     freeze_spectral_norm: bool = False
     mixed_precision: str = "fp16"
     model_dir: str = ""

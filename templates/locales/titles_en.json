@@ -203,6 +203,11 @@
     "title": "Adds a small amount of randomness to DREAM.",
     "description": "Experimental."
   },
+  "dream_randomness2": {
+    "label": "DREAM randomness experimental",
+    "title": "Adds a small amount of randomness to DREAM.",
+    "description": "Experimental."
+  },
   "freeze_spectral_norm": {
     "label": "Freeze Spectral Norm",
     "title": "Freeze spectral norm of the model weights.",
