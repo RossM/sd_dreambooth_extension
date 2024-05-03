@@ -244,21 +244,25 @@ class FilenameTextGetter:
         output = re.sub(r"\\", "", output)
 
         if self.shuffle_tags:
-            output = shuffle_tags(output)
+            output = process_tags(output, True, 0, True)
         else:
             output = output.strip()
 
         return output
 
 
-def shuffle_tags(caption: str):
-    tags = caption.split(',')
-    first_tag = tags.pop(0)
-    random.shuffle(tags)
-    tags.insert(0, first_tag)
-    output = ','.join(tags).strip()
+def process_tags(caption: str, shuffle_tags: bool, drop_p: float, skip_first: bool):
+    tags = [t.strip() for t in caption.split(',')]
+    if skip_first:
+        first_tag = tags.pop(0)
+    if shuffle_tags:
+        random.shuffle(tags)
+    if drop_p > 0:
+        tags = [t for t in tags if random.random() >= drop_p]
+    if skip_first:
+        tags.insert(0, first_tag)
+    output = ', '.join(tags)
     return output
-
 
 def get_scheduler_names():
     return [scheduler.name.replace('Scheduler', '') for scheduler in KarrasDiffusionSchedulers]

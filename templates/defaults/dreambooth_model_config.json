@@ -75,6 +75,8 @@
   "save_state_during": false,
   "scheduler": "UniPCMultistep",
   "shuffle_tags": true,
+  "drop_tags": 0.0,
+  "skip_first_tag": true,
   "split_loss": true,
   "stop_text_encoder": 0.75,
   "strict_tokens": true,

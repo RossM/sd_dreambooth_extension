@@ -14,7 +14,7 @@ from dreambooth import shared
 from dreambooth.dataclasses.prompt_data import PromptData
 from dreambooth.shared import status
 from dreambooth.utils.image_utils import make_bucket_resolutions, \
-    closest_resolution, shuffle_tags, open_and_trim
+    closest_resolution, process_tags, open_and_trim
 from dreambooth.utils.text_utils import build_strict_tokens
 from helpers.mytqdm import mytqdm
 
@@ -38,6 +38,8 @@ class DbDataset(torch.utils.data.Dataset):
             resolution: int,
             hflip: bool,
             do_shuffle_tags: bool,
+            drop_tags: float,
+            skip_first_tag: bool,
             strict_tokens: bool,
             dynamic_img_norm: bool,
             not_pad_tokens: bool,
@@ -93,6 +95,8 @@ class DbDataset(torch.utils.data.Dataset):
         self.resolution = resolution
         self.debug_dataset = debug_dataset
         self.shuffle_tags = do_shuffle_tags
+        self.drop_tags = drop_tags
+        self.skip_first_tag = skip_first_tag
         self.not_pad_tokens = not_pad_tokens
         self.strict_tokens = strict_tokens
         self.dynamic_img_norm = dynamic_img_norm
@@ -210,8 +214,8 @@ class DbDataset(torch.utils.data.Dataset):
         bs_embed = None  # default declaration
 
         auto_add_special_tokens = False if self.strict_tokens else True
-        if self.shuffle_tags:
-            prompt = shuffle_tags(prompt)
+        if self.shuffle_tags or self.drop_tags > 0:
+            prompt = process_tags(prompt, self.shuffle_tags, self.drop_tags, self.skip_first_tag)
         for tokenizer, text_encoder in zip(self.tokenizers, self.text_encoders):
             if self.strict_tokens:
                 prompt = build_strict_tokens(prompt, tokenizer.bos_token, tokenizer.eos_token)
@@ -294,7 +298,7 @@ class DbDataset(torch.utils.data.Dataset):
             else:
                 img = open_and_trim(image_path, res, False)
                 image = self.image_transform(img)
-            if self.shuffle_tags:
+            if self.shuffle_tags or self.drop_tags > 0:
                 caption, input_ids = self.cache_caption(image_path, caption)
             else:
                 input_ids = self.data_cache["captions"][image_path]
@@ -312,8 +316,8 @@ class DbDataset(torch.utils.data.Dataset):
         input_ids = None
         auto_add_special_tokens = False if self.strict_tokens else True
         if len(self.tokenizers) > 0 and (image_path not in self.data_cache["captions"] or self.debug_dataset):
-            if self.shuffle_tags:
-                caption = shuffle_tags(caption)
+            if self.shuffle_tags or self.drop_tags > 0:
+                caption = process_tags(caption, self.shuffle_tags, self.drop_tags, self.skip_first_tag)
             if self.strict_tokens:
                 caption = build_strict_tokens(caption, self.tokenizers[0].bos_token, self.tokenizers[0].eos_token)
             if self.not_pad_tokens:
@@ -324,7 +328,7 @@ class DbDataset(torch.utils.data.Dataset):
                 input_ids = self.tokenizers[0](caption, padding='max_length', truncation=True,
                                                add_special_tokens=auto_add_special_tokens,
                                                return_tensors='pt').input_ids
-            if not self.shuffle_tags:
+            if not self.shuffle_tags and self.drop_tags <= 0:
                 self.data_cache["captions"][image_path] = input_ids
 
         return caption, input_ids
@@ -398,7 +402,7 @@ class DbDataset(torch.utils.data.Dataset):
                         else:
                             self.data_cache["latents"][img_path] = data_cache["latents"][img_path]
 
-                    if not self.shuffle_tags:
+                    if not self.shuffle_tags and self.drop_tags <= 0:
                         if img_path not in data_cache["captions"] and not self.debug_dataset:
                             self.cache_caption(img_path, cap)
                         else:

@@ -686,6 +686,15 @@ def on_ui_tabs():
                         db_shuffle_tags = gr.Checkbox(
                             label="Shuffle Tags", value=True
                         )
+                        db_drop_tags = gr.Slider(
+                            label="Drop Tags",
+                            minimum=0,
+                            maximum=1,
+                            step=0.01,
+                        )
+                        db_skip_first_tag = gr.Checkbox(
+                            label="Skip First Tag", value=True
+                        )
                         db_max_token_length = gr.Slider(
                             label="Max Token Length",
                             minimum=75,
@@ -1571,6 +1580,8 @@ def on_ui_tabs():
             db_scheduler,
             db_shared_diffusers_path,
             db_shuffle_tags,
+            db_drop_tags,
+            db_skip_first_tag,
             db_snapshot,
             db_split_loss,
             db_src,

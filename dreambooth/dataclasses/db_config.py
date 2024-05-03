@@ -115,6 +115,8 @@ class DreamboothConfig(BaseModel):
     scheduler: str = "ddim"
     shared_diffusers_path: str = ""
     shuffle_tags: bool = True
+    drop_tags: float = 0.0
+    skip_first_tag: bool = True
     snapshot: str = ""
     split_loss: bool = True
     src: str = ""

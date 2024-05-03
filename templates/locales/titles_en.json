@@ -163,6 +163,16 @@
     "title": "Shuffle the tags before training.",
     "description": "Whether or not to shuffle the order of the tags before training. Shuffling the tags can help prevent overfitting by making it harder for the model to memorize the order of the tags.."
   },
+  "drop_tags": {
+    "label": "Drop Tags",
+    "title": "Randomly drop some tags during training.",
+    "description": "Whether or not to randomly drop some tags during training. Dropping tags can make the model more robust to inputs that don't match the usual tag format'."
+  },
+  "skip_first_tag": {
+    "label": "Skip First Tag",
+    "title": "Skip first tag when shuffling and dropping tags.",
+    "description": "Whether to skip the first tag when shuffling and/or dropping tags."
+  },
   "strict_tokens": {
     "label": "Strict Tokens",
     "title": "Enable strict token checking.",

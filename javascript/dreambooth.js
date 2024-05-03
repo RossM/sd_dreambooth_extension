@@ -310,6 +310,8 @@ let db_titles = {
     "Set Gradients to None When Zeroing": "When performing the backwards pass, gradients will be set to none, instead of creating a new empty tensor. This will slightly improve VRAM.",
     "Shuffle After Epoch": "When enabled, will shuffle the dataset after the first epoch. Will enable text encoder training and latent caching (More VRAM).",
     "Shuffle Tags": "When enabled, tags after the first ',' in a prompt will be randomly ordered, which can potentially improve training.",
+    "Drop Tags": "A chance from 0 to 1 for each tag after the first separated by ',' in a prompt to be randomly dropped, which can potentially improve training.",
+    "Skip First Tag": "Whether to exclude the first tag when randomly shuffling and/or dropping tags.",
     "Source Checkpoint": "The source checkpoint to extract for training.",
     "Step Ratio of Text Encoder Training": "The number of steps per image (Epoch) to train the text encoder for. Set 0.5 for 50% of the epochs",
     "Dynamic Image Normalization": "Normalizes each image separately by mean and standard deviation in your dataset. Useful to preserve likeness to your images.",

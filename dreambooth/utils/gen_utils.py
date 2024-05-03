@@ -82,6 +82,8 @@ def generate_dataset(
         resolution=args.resolution,
         hflip=args.hflip,
         do_shuffle_tags=args.shuffle_tags,
+        drop_tags=args.drop_tags,
+        skip_first_tag=args.skip_first_tag,
         strict_tokens=args.strict_tokens,
         dynamic_img_norm=args.dynamic_img_norm,
         not_pad_tokens=not args.pad_tokens,
