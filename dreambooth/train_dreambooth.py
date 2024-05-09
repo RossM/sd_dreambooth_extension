@@ -1880,6 +1880,10 @@ def main(class_gen_method: str = "Native Diffusers", user: str = None) -> TrainR
                             else:
                                 params_to_clip = unet.parameters()
                             accelerator.clip_grad_norm_(params_to_clip, 1)
+                            
+                        for param in unet.parameters():
+                            if param.grad != None:
+                                param.grad.nan_to_num_()
 
                         optimizer.step()
                         lr_scheduler.step(train_batch_size)
