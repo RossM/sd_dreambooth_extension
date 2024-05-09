@@ -544,6 +544,8 @@ def main(class_gen_method: str = "Native Diffusers", user: str = None) -> TrainR
                     text_encoder.to(accelerator.device, dtype=weight_dtype)
                     if args.model_type == "SDXL":
                         text_encoder_two.to(accelerator.device, dtype=weight_dtype)
+                if args.pixel_loss_weight != 0:
+                    vae.enable_gradient_checkpointing()
 
             ema_model = None
             if args.use_ema:
@@ -771,9 +773,10 @@ def main(class_gen_method: str = "Native Diffusers", user: str = None) -> TrainR
             tokenizer_max_length = tokenizer.model_max_length
             if args.cache_latents:
                 printm("Unloading vae.")
-                del vae
-                # Preserve reference to vae for later checks
-                vae = None
+                if args.pixel_loss_weight == 0:
+                    del vae
+                    # Preserve reference to vae for later checks
+                    vae = None
                 # TODO: Try unloading tokenizers here?
                 del tokenizer
                 if tokenizer_two is not None:
@@ -1513,7 +1516,7 @@ def main(class_gen_method: str = "Native Diffusers", user: str = None) -> TrainR
                         update_status({"images": last_samples, "prompts": last_prompts})
                         pbar2.update()
 
-                    if args.cache_latents:
+                    if args.cache_latents and args.pixel_loss_weight == 0.0:
                         printm("Unloading vae.")
                         del vae
                         # Preserve the reference again
@@ -1792,8 +1795,30 @@ def main(class_gen_method: str = "Native Diffusers", user: str = None) -> TrainR
                             model_pred = unet(noisy_latents, timesteps, encoder_hidden_states).sample
 
                         def loss_fn(model_pred, target):
-                            loss = F.mse_loss(model_pred.float(), target.float(), reduction="none").mean(dim=(1,2,3))
-                            return loss.mean()
+                            latent_loss = F.mse_loss(model_pred.float(), target.float(), reduction="none").mean(dim=(1,2,3))
+                            if args.pixel_loss_weight != 0:
+                                alpha_prod = noise_scheduler.alphas_cumprod.to(timesteps.device)[
+                                    timesteps, None, None, None]
+                                sqrt_alpha_prod = alpha_prod ** 0.5
+                                sqrt_one_minus_alpha_prod = (1 - alpha_prod) ** 0.5
+
+                                if noise_scheduler.config.prediction_type == "epsilon":
+                                    pred_latents = (noisy_latents - sqrt_one_minus_alpha_prod * model_pred) / sqrt_alpha_prod
+                                elif noise_scheduler.config.prediction_type == "v_prediction":
+                                    pred_latents = sqrt_alpha_prod * noisy_latents - sqrt_one_minus_alpha_prod * model_pred
+                                else:
+                                    raise ValueError(
+                                        f"Unknown prediction type {noise_scheduler.config.prediction_type}")
+
+                                pixel_target = vae.decode(latents.to(weight_dtype)).sample
+                                pixel_pred = vae.decode(pred_latents.to(weight_dtype)).sample
+
+                                pixel_loss = F.mse_loss(pixel_pred.float(), pixel_target.float(), reduction="none").mean(dim=(1,2,3))
+                            else:
+                                pixel_loss = latent_loss.new_zeros([])
+
+                            loss = torch.lerp(latent_loss.mean(), pixel_loss.mean(), args.pixel_loss_weight)
+                            return loss
                         
                         if args.model_type != "SDXL":
                             # TODO: set a prior preservation flag and use that to ensure this ony happens in dreambooth

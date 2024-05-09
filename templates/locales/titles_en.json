@@ -218,6 +218,11 @@
     "title": "Adds a small amount of randomness to DREAM.",
     "description": "Experimental."
   },
+  "pixel_loss_weight": {
+    "label": "Pixel loss weight",
+    "title": "Alternate loss that passes image through VAE decoder.",
+    "description": "Experimental."
+  },
   "freeze_spectral_norm": {
     "label": "Freeze Spectral Norm",
     "title": "Freeze spectral norm of the model weights.",

@@ -173,6 +173,12 @@
     "max": 1,
     "step": 0.01
   },
+  "pixel_loss_weight": {
+    "value": 0.0,
+    "min": 0.0,
+    "max": 1,
+    "step": 0.01
+  },
   "freeze_spectral_norm": {
     "value": false
   },

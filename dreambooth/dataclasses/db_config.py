@@ -92,6 +92,7 @@ class DreamboothConfig(BaseModel):
     prior_loss_target: int = 100
     prior_loss_weight: float = 0.75
     prior_loss_weight_min: float = 0.1
+    pixel_loss_weight: float = 0.0
     resolution: int = 512
     revision: int = 0
     sample_batch_size: int = 1
