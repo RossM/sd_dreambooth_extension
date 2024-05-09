@@ -191,6 +191,15 @@
   "shuffle_tags": {
     "value": true
   },
+  "drop_tags": {
+    "value": 0.0,
+    "min": 0,
+    "max": 1,
+    "step": 0.01
+  },
+  "skip_first_tag": {
+    "value": true
+  },
   "strict_tokens": {
     "value": true
   },
