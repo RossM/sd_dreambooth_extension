@@ -1521,6 +1521,8 @@ def main(class_gen_method: str = "Native Diffusers", user: str = None) -> TrainR
                         del vae
                         # Preserve the reference again
                         vae = None
+                    else:
+                        vae = create_vae()
 
                     status.current_image = last_samples
                     update_status({"images": last_samples})
