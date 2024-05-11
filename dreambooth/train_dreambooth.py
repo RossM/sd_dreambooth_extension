@@ -1066,6 +1066,9 @@ def main(class_gen_method: str = "Native Diffusers", user: str = None) -> TrainR
                 save_snapshot = False
 
                 if shared.status.do_save_samples:
+                    if args.use_lora:
+                        save_lora = True
+                    save_model = True
                     save_image = True
                     shared.status.do_save_samples = False
 
