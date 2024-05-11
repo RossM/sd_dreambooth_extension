@@ -1586,8 +1586,8 @@ def main(class_gen_method: str = "Native Diffusers", user: str = None) -> TrainR
                 alphas_cumprod = noise_scheduler.alphas_cumprod.to(unet.device)
                 snr = alphas_cumprod / (1 - alphas_cumprod)
 
-                # Compute MinSNR loss weight
-                loss_weight = torch.clamp(snr, max=args.min_snr_gamma)
+                # Compute Soft-MinSNR loss weight
+                loss_weight = (snr ** -1 + args.min_snr_gamma ** -1) ** -1
 
                 # Compute cumulative loss weight scaled to (0, 1)
                 cum_loss_weight = torch.cumsum(loss_weight, 0)
