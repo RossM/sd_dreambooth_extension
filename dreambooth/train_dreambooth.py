@@ -471,8 +471,7 @@ def main(class_gen_method: str = "Native Diffusers", user: str = None) -> TrainR
                     torch_dtype=torch.float32,
                 )
 
-            cum_latent_loss = 0
-            cum_pixel_loss = 0
+            cum_pixel_loss = cum_latent_loss = cum_pixel_weight = cum_latent_weight = 0
 
             printm("Created tenc")
             pbar2.set_description("Loading VAE...")
@@ -1833,7 +1832,7 @@ def main(class_gen_method: str = "Native Diffusers", user: str = None) -> TrainR
                                 pixel_loss[pixel_mask] = F.mse_loss(pixel_pred.float(), pixel_target.float(), reduction="none").mean(dim=(1,2,3))
                                 
                                 # Ad hoc weight factor to make losses have approximately the same scale
-                                pixel_loss = 2000 * pixel_loss
+                                pixel_loss = 700 * pixel_loss
                             
                             else:
                                 pixel_loss = latent_loss.new_zeros([])
@@ -1841,10 +1840,10 @@ def main(class_gen_method: str = "Native Diffusers", user: str = None) -> TrainR
                             loss = torch.lerp(latent_loss, pixel_loss, pixel_loss_weight).mean()
                                 
                             nonlocal cum_pixel_loss, cum_latent_loss
-                            cum_pixel_loss += pixel_loss.mean().item()
-                            cum_latent_loss += latent_loss.mean().item()
-
-                            #progress_bar.write(f"{latent_loss.mean()}, {pixel_loss.mean()}, {loss}, {cum_latent_loss / cum_pixel_loss}")
+                            cum_pixel_loss += (pixel_loss * pixel_loss_weight).mean().cpu()
+                            cum_latent_loss += (latent_loss * pixel_loss_weight).mean().cpu()
+                            
+                            #progress_bar.write(f"{latent_loss.mean().cpu()}, {pixel_loss.mean().cpu()}, {loss.cpu()}, {cum_latent_loss / cum_pixel_loss}")
 
                             return loss
                         
