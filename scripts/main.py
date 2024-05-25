@@ -674,6 +674,22 @@ def on_ui_tabs():
                             value=0.0,
                             visible=True,
                         )
+                        db_l1_weight = gr.Slider(
+                            label="L1 weight",
+                            minimum=0,
+                            maximum=1,
+                            step=0.01,
+                            value=0.0,
+                            visible=True,
+                        )
+                        db_l1_gamma = gr.Slider(
+                            label="L1 gamma",
+                            minimum=0,
+                            maximum=1,
+                            step=0.01,
+                            value=0.5,
+                            visible=True,
+                        )
                         db_pixel_loss_weight = gr.Slider(
                             label="Pixel loss weight",
                             minimum=0,
@@ -684,6 +700,14 @@ def on_ui_tabs():
                         )
                         db_freeze_spectral_norm = gr.Checkbox(
                             label="Freeze Spectral Norm", value=False
+                        )
+                        db_trainable_clip_layers = gr.Slider(
+                            label="Trainable CLIP layers",
+                            minimum=0,
+                            maximum=10,
+                            step=1,
+                            value=0,
+                            visible=True,
                         )
                         db_pad_tokens = gr.Checkbox(
                             label="Pad Tokens", value=True
@@ -1412,8 +1436,11 @@ def on_ui_tabs():
             db_dream_detail_preservation,
             db_dream_randomness,
             db_dream_randomness2,
+            db_l1_weight,
+            db_l1_gamma,
             db_pixel_loss_weight,
             db_freeze_spectral_norm,
+            db_trainable_clip_layers,
             db_pad_tokens,
             db_strict_tokens,
             db_max_token_length,
@@ -1552,8 +1579,11 @@ def on_ui_tabs():
             db_dream_detail_preservation,
             db_dream_randomness,
             db_dream_randomness2,
+            db_l1_weight,
+            db_l1_gamma,
             db_pixel_loss_weight,
             db_freeze_spectral_norm,
+            db_trainable_clip_layers,
             db_mixed_precision,
             db_model_name,
             db_model_path,

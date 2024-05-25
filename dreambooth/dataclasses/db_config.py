@@ -75,7 +75,10 @@ class DreamboothConfig(BaseModel):
     dream_detail_preservation: float = 0.5
     dream_randomness: float = 0.0
     dream_randomness2: float = 0.0
+    l1_weight: float = 0.0
+    l1_gamma: float = 0.5
     freeze_spectral_norm: bool = False
+    trainable_clip_layers: int = 0
     mixed_precision: str = "fp16"
     model_dir: str = ""
     model_name: str = ""

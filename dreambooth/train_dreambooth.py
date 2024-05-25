@@ -673,21 +673,28 @@ def main(class_gen_method: str = "Native Diffusers", user: str = None) -> TrainR
 
 
             elif stop_text_percentage != 0:
+                text_encoder_parameters = text_encoder.parameters()
+                if args.trainable_clip_layers != 0:
+                    text_encoder_parameters = []
+                    for layerid in range(-args.trainable_clip_layers, 0):
+                        text_encoder_parameters += list(text_encoder.text_model.encoder.layers[layerid].parameters())
+
                 if args.train_unet:
                     if args.model_type == "SDXL":
-                        params_to_optimize = itertools.chain(unet.parameters(), text_encoder.parameters(),
+                        params_to_optimize = itertools.chain(unet.parameters(), text_encoder_parameters,
                                                              text_encoder_two.parameters())
                     else:
-                        params_to_optimize = itertools.chain(unet.parameters(), text_encoder.parameters())
+                        params_to_optimize = itertools.chain(unet.parameters(), text_encoder_parameters)
                 else:
                     if args.model_type == "SDXL":
-                        params_to_optimize = itertools.chain(text_encoder.parameters(), text_encoder_two.parameters())
+                        params_to_optimize = itertools.chain(text_encoder_parameters, text_encoder_two.parameters())
                     else:
-                        params_to_optimize = itertools.chain(text_encoder.parameters())
+                        params_to_optimize = itertools.chain(text_encoder_parameters)
             else:
                 params_to_optimize = unet.parameters()
 
             optimizer = get_optimizer(args.optimizer, learning_rate, args.weight_decay, params_to_optimize)
+            print(f"len(optimizer.param_groups) = {len(optimizer.param_groups)}")
             if len(optimizer.param_groups) > 1:
                 try:
                     optimizer.param_groups[1]["weight_decay"] = args.tenc_weight_decay
@@ -1813,6 +1820,11 @@ def main(class_gen_method: str = "Native Diffusers", user: str = None) -> TrainR
                             #progress_bar.write(f"{pixel_loss_weight}, {timesteps}, {sqrt_one_minus_alpha_prod}")
 
                             latent_loss = F.mse_loss(model_pred.float(), target.float(), reduction="none").mean(dim=(1,2,3))
+                            
+                            if args.l1_weight != 0:
+                                l1_weight = args.l1_weight * (1 - (1 - alpha_prod) ** args.l1_gamma)
+                                latent_loss = latent_loss + l1_weight * F.l1_loss(model_pred.float(), target.float(), reduction="none").mean(dim=(1,2,3))
+
                             loss = latent_loss
                             
                             if pixel_mask.any():
@@ -1898,10 +1910,10 @@ def main(class_gen_method: str = "Native Diffusers", user: str = None) -> TrainR
                         if accelerator.sync_gradients and not args.use_lora:
                             if train_tenc:
                                 if args.model_type == "SDXL":
-                                    params_to_clip = itertools.chain(unet.parameters(), text_encoder.parameters(),
+                                    params_to_clip = itertools.chain(unet.parameters(), text_encoder_parameters,
                                                                      text_encoder_two.parameters())
                                 else:
-                                    params_to_clip = itertools.chain(unet.parameters(), text_encoder.parameters())
+                                    params_to_clip = itertools.chain(unet.parameters(), text_encoder_parameters)
                             else:
                                 params_to_clip = unet.parameters()
                             accelerator.clip_grad_norm_(params_to_clip, 1)
