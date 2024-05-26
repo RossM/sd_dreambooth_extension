@@ -1048,6 +1048,9 @@ def main(class_gen_method: str = "Native Diffusers", user: str = None) -> TrainR
                 save_image = False
                 save_model = False
                 save_lora = False
+                
+                if global_step > 0 and global_step % 10000 == 0:
+                    save_model = True
 
                 if save_canceled or save_completed:
                     logger.debug("\nSave completed/canceled.")
@@ -2056,7 +2059,7 @@ def main(class_gen_method: str = "Native Diffusers", user: str = None) -> TrainR
                             status_handler.end(status.textinfo)
                         break
 
-                    if status.do_save_model or status.do_save_samples:
+                    if status.do_save_model or (global_step > 0 and global_step % 10000 == 0):
                         check_save(False)
 
                 accelerator.wait_for_everyone()
