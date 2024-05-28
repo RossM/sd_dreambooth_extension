@@ -258,6 +258,11 @@ def process_tags(caption: str, shuffle_tags: bool, drop_p: float, skip_first: bo
     if shuffle_tags:
         random.shuffle(tags)
     if drop_p > 0:
+        # Randomly drop more tags if there are a lot of tags in the image
+        tag_cap = random.randint(10, 30)
+        if len(tags) > tag_cap:
+            drop_p = 1 - (1 - drop_p) * tag_cap / len(tags)
+            
         tags = [t for t in tags if random.random() >= drop_p]
     if skip_first:
         tags.insert(0, first_tag)
