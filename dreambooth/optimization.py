@@ -607,13 +607,11 @@ def get_optimizer(optimizer: str, learning_rate: float, weight_decay: float, par
             return PagedAdamW8bit(
                 params_to_optimize,
                 lr=learning_rate,
-                betas=(0.9, 0.999),
-                eps=1e-8,
                 weight_decay=weight_decay,
                 percentile_clipping=100,
+                min_8bit_size=4096,
                 block_wise=True,
                 amsgrad=False,
-                paged=True,
             )
 
         elif optimizer == "Apollo":
