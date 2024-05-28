@@ -1051,6 +1051,7 @@ def main(class_gen_method: str = "Native Diffusers", user: str = None) -> TrainR
                 
                 if global_step > 0 and global_step % 10000 == 0:
                     save_model = True
+                    save_image = True
 
                 if save_canceled or save_completed:
                     logger.debug("\nSave completed/canceled.")
