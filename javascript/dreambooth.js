@@ -641,16 +641,10 @@ function requestMoreDbProgress() {
     let gen_ckpt = gradioApp().getElementById("db_gen_ckpt");
     let gen_ckpt_during = gradioApp().getElementById("db_gen_ckpt_during");
     if (progressDiv && interrupt && train && gen_sample) {
-        if (training_started) {
-            gen_sample.style.display = "block";
-            train.style.display = "none";
-            interrupt.style.display = "block";
-            gen_ckpt.style.display = "none";
-            gen_ckpt_during.style.display = "block";
-        } else {
-            train.style.display = "none";
-            interrupt.style.display = "block";
-            gen_ckpt.style.display = "none";
-        }
+        gen_sample.style.display = "block";
+        train.style.display = "none";
+        interrupt.style.display = "block";
+        gen_ckpt.style.display = "none";
+        gen_ckpt_during.style.display = "block";
     }
 }
