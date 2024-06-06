@@ -1660,7 +1660,11 @@ def main(class_gen_method: str = "Native Diffusers", user: str = None) -> TrainR
                             set_lora_requires_grad(text_encoder_two, train_tenc)
                             text_encoder_two.text_model.embeddings.position_embedding.requires_grad_(train_tenc)
                 else:
-                    text_encoder.requires_grad_(train_tenc)
+                    text_encoder.requires_grad_(False)
+                    if train_tenc:
+                        for param in text_encoder_parameters:
+                            param.requires_grad_(True)
+                    
                     if args.model_type == "SDXL":
                         text_encoder_two.requires_grad_(train_tenc)
 
