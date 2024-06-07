@@ -1602,6 +1602,9 @@ def main(class_gen_method: str = "Native Diffusers", user: str = None) -> TrainR
                 # Compute Soft-MinSNR loss weight
                 loss_weight = (snr ** -1 + args.min_snr_gamma ** -1) ** -1
 
+                if noise_scheduler.config.prediction_type == "epsilon":
+                    loss_weight.div_(snr)
+
                 # Compute cumulative loss weight scaled to (0, 1)
                 cum_loss_weight = torch.cumsum(loss_weight, 0)
                 cum_loss_weight = cum_loss_weight / cum_loss_weight[-1]
@@ -2064,7 +2067,7 @@ def main(class_gen_method: str = "Native Diffusers", user: str = None) -> TrainR
                             status_handler.end(status.textinfo)
                         break
 
-                    if status.do_save_model or (global_step > 0 and global_step % 10000 == 0):
+                    if status.do_save_model or status.do_save_samples or (global_step > 0 and global_step % 10000 == 0):
                         check_save(False)
 
                 accelerator.wait_for_everyone()
