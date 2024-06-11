@@ -1833,7 +1833,7 @@ def main(class_gen_method: str = "Native Diffusers", user: str = None) -> TrainR
                             latent_loss = F.mse_loss(model_pred.float(), target.float(), reduction="none").mean(dim=(1,2,3))
                             
                             if args.l1_weight != 0:
-                                l1_weight = args.l1_weight * (1 - (1 - alpha_prod) ** args.l1_gamma)
+                                l1_weight = args.l1_weight * (1 - (1 - alpha_prod) ** args.l1_gamma) * snr ** 0.5
                                 latent_loss = latent_loss + l1_weight * F.l1_loss(model_pred.float(), target.float(), reduction="none").mean(dim=(1,2,3))
 
                             loss = latent_loss
